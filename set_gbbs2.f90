@@ -251,15 +251,15 @@ close(35)
     write(*,*) ''
     write(*,*) '&&&&& the pressure range: P_init; P_step ;P_final &&&&&'
     write(*,*) ' ' 
-    write(*,'(a)', advance='no' ) '--> pressure range: P_init = '
+    write(*,'(a)', advance='no' ) '--> pressure range (GPa): P_init = '
     read (*,*) pi  
-   write(*,'(a)', advance='no') '--> pressure range: P_step = '
+   write(*,'(a)', advance='no') '--> pressure range (GPa): P_step = '
    read (*,*) sp
-   write(*,'(a)', advance='no') '--> pressure range: P_final = '
+   write(*,'(a)', advance='no') '--> pressure range (GPa): P_final = '
    read (*,*) pf
    write(100,222)   pi,sp,pf
    write(*,*)
-   write(*,*) '&&&&&& the temperature range: T_init; T_step ; T_final &&&&&'
+   write(*,*) '&&&&&& the temperature range (K): T_init; T_step ; T_final &&&&&'
    write(*,*)
    write(*,'(a)', advance='no') '--> temperature range: T_init = '
    read (*,*) ti  
