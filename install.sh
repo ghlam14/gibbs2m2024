@@ -4,10 +4,12 @@ echo ""
 
 if( ! -e gibbs2 ) then
 echo ""
-echo "************************************* "
+echo "********************************************** "
 echo "#         Download Gibbs2              "
+echo "     from official website              "
+echo " https://github.com/aoterodelaroza/gibbs2.git "
 echo "           please wait ...               "
-echo "************************************* "
+echo "********************************************* "
 echo ""
 echo ""
 
