@@ -1,0 +1,172 @@
+#!/bin/csh -f
+set file    = `pwd`
+set file    = $file:t 
+set   dirc  = $file"_Gibbs2"
+set bold = `tput bold`
+set normal = `tput sgr0`
+set redd = `tput setaf 1`
+set green = `tput setaf 2`
+set nc = `tput sgr0`
+echo ""
+echo ""
+echo ""
+echo "#######################################"
+echo "         setup and run   "
+echo "               Gibbs2         "
+echo "           for  wien2k  users        "
+echo "       script@Benabdellah 1/2024               "
+echo "#######################################"
+sleep 2
+
+echo ""
+echo ""
+echo ""
+  if($?EDITOR) then
+    alias editor '$EDITOR'
+  else
+    alias editor emacs
+  endif
+ 
+
+mkdir -p $dirc
+
+
+ 
+if ( -e $file.outputeos &&  -e $file.struct ) then
+   echo 'T' > $dirc/datatest
+   cp $file.outputeos $dirc/ 
+   cp $file.struct  $dirc/
+   cd $dirc/
+#   cp $file.outputeos  case.outputeos
+   
+  echo "Paramater of your structure $file :"   
+  echo ""
+  echo "Lattice Space Groups:  "  `sed -n 2,2p $file.struct ` 
+  echo " "
+  if (-e atnumber )   rm atnumber
+ 
+### find number of atom#########################
+  set nmult=`grep MULT $file.struct | wc -l`
+  set j = 1
+  set mult = 0
+  
+  while ( $j <= $nmult )
+  set multn=`grep MULT $file.struct | cut -f2 -d= | cut -c1-3 | head -$j | tail -1`
+  
+  @ mult = $mult + $multn
+  echo " $multn" >> atnumber
+  @ j ++
+  end
+  
+  
+  set at = `grep Z:    "$file.struct" | cut -c1-2 ` 
+  set z = `grep Z:    "$file.struct" | cut -f2 -d: | awk '{print $1-$2}'` 
+  set  i=1
+  echo " Atoms      :    Z  "
+
+  loop:
+  echo "   $at[$i]        :    $z[$i]  "
+  @ i ++
+  if ( $i <= $#at ) goto loop
+  echo
+  echo "The total number of atoms in the primitive cell is: $bold VFREE=  $mult $nc"
+  echo ""
+  #grep MULT= "$file.struct" 
+  grep Z:    "$file.struct"  > atome
+  grep V0,B      "$file.outputeos"  >  volume.out
+ 
+  set ph=`grep LATTICE "$file.struct"  | cut -f1 -d= | cut -c1-2  | tail -1`
+  set gr=`grep LATTICE "$file.struct"  | cut -f1 -d= | cut -c31-41  | tail -1`
+  #echo "$ph"
+  #echo "$gr"
+  echo "$file"_"$ph"> phase
+  sleep 1
+  cd ..
+  
+else 
+  echo 'F' > $dirc/datatest
+endif    
+ 
+ 
+ 
+cd  $file"_Gibbs2"
+ 
+setupgibbs2
+
+
+ 
+if ( ! -e case.ing || -z case.ing ) then
+    goto error 
+endif
+
+cp case.ing   $file.ing
+ rm case.ing
+ if (-e $file.outputeos) then
+ rm phase
+ rm atnumber
+ rm atome
+ rm volume.out
+endif
+
+
+    echo -n "     Do you want   view input file for Gibbs2 ? (y/N) "
+    set yn = ($<)
+    if ( $yn == y || $yn == Y) then
+    editor  $file.ing
+    endif
+
+clear
+echo "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+echo "       run Gibbs2 "
+echo "       please wait "
+echo "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+sleep 1
+
+gibbs2 $file.ing  |& tee  $file.out     
+ 
+echo ""
+echo ""
+echo " outpute informations are in files:    $file.out"
+echo ""
+#cat $file.out
+echo ""
+sleep 2
+
+
+
+grep number $file.out  | cut -f1 -d= | cut -c28-35  | tail -1 > num
+if (-z num ) echo " 1" > num 
+if (-e files ) then
+rm -r files
+endif
+#mkdir files
+
+#cp $file.eos case.eos
+#mv case.eos  files/
+#mv num files/
+#cd files/
+#sed '/^ *$/d' case.eos | awk '$1+0==0' | awk '/# Phase/{print ""; print ""} {print}'> T_eos_P0
+#sed '/^ *$/d' case.eos | awk '$2+0==0' | awk '/# Phase/{print ""; print ""} {print}'> P_eos_T0
+#d_gibs 
+# rm num
+ #rm case.eos
+ #rm T
+ #rm p
+ #rm vT
+#cd ..
+
+
+echo ""
+echo "   outdata in  $bold $file"_Gibbs2"/  $nc"
+echo ""
+echo "=========>   to plot the results (format  .eps   or  .pdf ) run :  $bold $green plot_gibbs2  $nc $nc"
+echo ""
+exit(0)
+
+error:
+echo ">>>"
+echo "    Error :outpute not found "
+echo "    "
+echo ">>>"
+
+exit(1)

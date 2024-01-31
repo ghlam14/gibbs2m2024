@@ -1,0 +1,137 @@
+#!/bin/csh -f
+unalias rm
+set file    = `pwd`
+set file    = $file:t 
+set   fname = 'pwdname'
+set   dirc  = $file"_Gibbs2"
+set bold = `tput bold`
+set normal = `tput sgr0`
+set redd = `tput setaf 1`
+set green = `tput setaf 2`
+set nc = `tput sgr0`
+
+clear
+echo ""
+echo ""
+echo ""
+echo "    ####################################################"
+echo "    cut $file.eos for Pressure and temperature values   "
+echo "    ####################################################"
+sleep 1
+
+
+
+  
+if !(-e $file.eos ) then
+in:
+echo
+echo -n " give the name of case.eos file (without .eos ):"
+set nam=($<)
+if !(-e $nam.eos ) then
+echo " "
+echo "&&&&&  $nam.eos Not found &&&&&&  "
+goto in
+else
+sed -e '/#/,/#/d' $nam.eos > eos
+echo
+echo "cut $nam.eos for Pressure and temperature values"
+set file=$nam
+endif
+
+else
+ sed -e '/#/,/#/d' $file.eos > eos 
+ echo
+echo "cut $file.eos for Pressure and temperature values"
+endif
+  
+init:
+cat <<EOF
+
+for exit  (e)
+for pressure (p)
+for temperature(t)
+
+EOF
+  
+echo -n "Pressure/Temperature/ or exit (t/p/e)? "
+  
+  set choix=($<)
+  if ($choix == "p" || $choix == "P") then
+  goto press1
+  else if ($choix == "t" || $choix == "T") then
+  goto temp1
+  else if ($choix == "e" || $choix == "E") then
+  goto error
+  else
+  goto
+  init:
+  endif
+  
+  
+ 
+ press1:
+ echo -n " which Pressure value do you want? :  "
+ press:
+  set pval=($<)
+ 
+ if ($pval == "") goto press
+ if ($pval == "t" || $pval == "T"  ) then
+  goto temp1
+   else if  ($pval == "e" || $pval == "E"  ) then
+   goto error
+ endif
+ 
+ echo " input Pressure value : $pval "
+  set pressure=`awk '{print $1 }' eos | sed '/^$/q'`
+ 
+ set i=1
+ loop:
+  set p=$pressure[$i]
+   if (`echo "$pval == $p " |bc -l` ) then
+     echo "    #p(GPa)      T(K)   V(bohr^3)    Estatic(Hy)        G(kJ/mol)        Gerr(kJ/mol)    p_sta(GPa)  p_th(GPa)  B(GPa)    U-Esta(kJ/mol)   Cv(J/molK)   F-Esta(kJ/mol)   S(J/molK)     ThetaD(K)  gamma     alpha(10^-5/K)  dp/dT(GPa/K)    Bs(GPa)    Cp(J/molK)        B_Tp    B_Tpp(GPa-1)  Fvib(kJ/mol)    Fel(kJ/mol)   Uvib(kJ/mol)    Uel(kJ/mol)   Svib(J/molK)    Sel(J/molK)  Cv_vib(J/molK) Cv_el(J/molK)" > P_$pval
+     sed '/^ *$/d' eos | awk '$1+0=='$p'' | awk '/# Phase/{print ""; print ""} {print}'>> P_$pval
+  endif
+  @ i ++
+  if ( $i <= $#pressure ) goto loop
+goto press
+
+
+temp1:
+echo -n " which Temperature value do you want?:"
+temp: 
+ set tval=($<)
+ if ($tval == "") goto temp
+ 
+ if ($tval == "P" || $tval == "p"  ) then
+  goto press1
+   else if  ($tval == "e" || $tval == "E"  ) then
+  goto error
+ endif
+
+ echo " input Temperature value : $tval "
+ 
+  set i=1
+ set temp=`awk '{print $2 }' eos | sort -n | uniq `
+ 
+ loop2:
+   set t=$temp[$i]
+   if (`echo "$tval == $t " |bc -l` ) then
+   echo "    #p(GPa)      T(K)   V(bohr^3)    Estatic(Hy)        G(kJ/mol)        Gerr(kJ/mol)    p_sta(GPa)  p_th(GPa)  B(GPa)    U-Esta(kJ/mol)   Cv(J/molK)   F-Esta(kJ/mol)   S(J/molK)     ThetaD(K)  gamma     alpha(10^-5/K)  dp/dT(GPa/K)    Bs(GPa)    Cp(J/molK)        B_Tp    B_Tpp(GPa-1)  Fvib(kJ/mol)    Fel(kJ/mol)   Uvib(kJ/mol)    Uel(kJ/mol)   Svib(J/molK)    Sel(J/molK)  Cv_vib(J/molK) Cv_el(J/molK)"  > T_$tval
+   sed '/^ *$/d' eos | awk '$2+0=='$t'' | awk '/# Phase/{print ""; print ""} {print}'>> T_$tval
+   endif
+  @ i ++
+  if ( $i <= $#temp ) goto loop2
+
+  
+  goto temp
+
+
+exit(0)
+
+error:
+   echo "---------------------------"
+   echo " End job exit "
+   echo "---------------------------"
+  exit
+
+

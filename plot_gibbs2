@@ -1,0 +1,86 @@
+#!/bin/tcsh -f
+set file  = `pwd`
+set file  = $file:t 
+set dirc  = $file"_Gibbs2"
+echo ""
+echo ""
+echo ""
+echo "#######################################"
+echo "                                       "
+echo "       Plot  Gibbs2  output            "
+echo "                      "
+echo "       script@Benabdellah              "
+echo "#############last update 2024 #########"
+sleep 2
+
+echo ""
+echo ""
+echo ""
+  if($?EDITOR) then
+    alias editor '$EDITOR'
+  else
+    alias editor emacs
+  endif
+ 
+
+if (-e  $file"_Gibbs2" ) then
+    cd  $file"_Gibbs2"
+else
+ set file = `echo "$file" | sed -e "1s/_Gibbs2//g"`
+endif
+echo "$file"
+if (-e  $file"_efit".gnu ) then
+ 
+    echo "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+    echo "       Plot output data "
+    echo "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+    mkdir -p plots
+    echo ""
+    echo ""
+    echo -n "     Do you want to edit plot file ? (y/N) "
+    set yn = ($<)
+    if ( $yn == y || $yn == Y) then
+        editor  $file"_efit".gnu
+    endif
+    gnuplot $file"_efit".gnu
+  
+
+    echo ""
+    echo ""
+    echo -n "     Do you want to edit plot file ? (y/N) "
+    set yn = ($<)
+    if ( $yn == y || $yn == Y) then
+        editor $file"_all_p".gnu
+    endif
+    gnuplot $file"_all_p".gnu
+    echo ""
+    echo ""
+    echo -n "     Do you want to edit plot file ? (y/N) "
+    set yn = ($<)
+    if ( $yn == y || $yn == Y) then
+    editor $file"_all_t".gnu
+    endif
+    gnuplot $file"_all_t".gnu
+    mv   *.eps  plots/
+    mv   *.ps  plots/
+    mv  *.pdf plots/
+    sleep 2
+    echo ""
+    echo "====================================================="
+    echo ""
+    echo "               outdata in  $file"_Gibbs2"/plots/  "
+    echo ""
+    echo "=====================> END job <====================="
+else
+    goto error
+endif
+echo ""
+exit(0)
+
+error:
+echo ">>>"
+echo "    Error :Gibbs2 Output not found "
+echo "    "
+echo ">>>"
+
+exit(1)
