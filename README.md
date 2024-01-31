@@ -4,9 +4,11 @@ Alternatively, clone the git repository for the latest version of the code (last
     git clone https://github.com/ghlam14/gibbs2m2024.git
  
 to install:
-    cd gibbs2m2024/
-    chmod +x install.sh
-    ./install.sh
+       cd gibbs2m2024/
+       
+       chmod +x install.sh
+       
+       ./install.sh
 
 To run exemple:
 for wien2k user: need   .struct file and .outputeos  files
