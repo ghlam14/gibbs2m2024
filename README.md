@@ -1,3 +1,4 @@
+required packages : ( git , gfortran | ifort  , gnuplot , epstopdf , pdfcrop).
 
 Alternatively, clone the git repository for the latest version of the code (last modiefed: 12/01/2024):
    
