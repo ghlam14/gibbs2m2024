@@ -12,7 +12,10 @@ to install:
               
        ./install.sh
 To run only a simple exemple (quick run) for more option, my should read the userguide :
+      
       https://aoterodelaroza.github.io/gibbs2/quickstart/
+
+
 To run exemple:
 for wien2k user: need   .struct file and .outputeos  files
 
