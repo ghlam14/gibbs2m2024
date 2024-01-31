@@ -11,12 +11,14 @@ to install:
        chmod +x install.sh
               
        ./install.sh
-
+To run only a simple exemple (quick run) for more option, my should read the userguide :
+      https://aoterodelaroza.github.io/gibbs2/quickstart/
 To run exemple:
 for wien2k user: need   .struct file and .outputeos  files
 
 after volume  optimization (to  get  case.outputeos file ) you can run  the gibbs2  by the following command line:
-# ( to set and run gibbs2 ) 
+
+# to set and run gibbs2 
     set_gibbs2            
 # to plot the results
     plot_gibbs2            
