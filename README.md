@@ -1,4 +1,3 @@
-https://camo.githubusercontent.com/f96fc394972e4982d57efb3f4bc61184351ea2cba8241661b95eeef94c1c68a4/68747470733a2f2f70726f66696c652d636f756e7465722e676c697463682e6d652f456c41546f6f6c732f636f756e742e737667
 required packages : ( git , gfortran | ifort  , gnuplot , epstopdf , pdfcrop).
 
 Alternatively, clone the git repository for the latest version of the code (last modiefed: 12/01/2024):
